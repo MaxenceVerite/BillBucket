@@ -1,0 +1,126 @@
+﻿@model BillBucket.Models.Facture
+
+@{
+    ViewData["Title"] = "Details";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+
+<div class="jumbotron " id="mail">
+    <h4>Facture <span class="text-primary">n° @Model.NoFacture </span></h4>
+    <hr />
+    <div class="row">
+        @*Notre Entreprise*@
+        <div class="col-3">
+            <ul class="list-group">
+
+                <li class="list-group-item">
+                    Entreprise BillBucket
+                </li>
+
+                <li class="list-group-item">
+                    SIRET n°58447788662571
+                </li>
+
+                <li class="list-group-item">
+                    272 Rue Pierre Montignant 59000 Lille
+                </li>
+
+                <li class="list-group-item">
+                    0785854789
+                </li>
+            </ul>
+        </div>
+        <div class="col-6">
+
+        </div>
+
+
+        @*Le client*@
+
+        <div class="col-3">
+            <ul class="list-group">
+                <li class="list-group-item">
+                    Client @Model.Client.Nom
+                </li>
+                <li class="list-group-item">
+                    SIRET n° @Model.Client.NoSiret
+                </li>
+                <li class="list-group-item">
+                    @Model.Client.Adresse
+                </li>
+                <li class="list-group-item">
+                    @Model.Client.NoTel
+                </li>
+            </ul>
+
+        </div>
+
+
+
+    </div>
+
+    <hr />
+
+    @*Le Detail De La Facture*@
+    <div class="jumbotron bg-white row">
+        <div class="col-2"></div>
+        <div class="col-8">
+
+
+            <h3>@Html.DisplayNameFor(m => Model.Description)</h3>
+
+            <p>@Model.Description</p>
+
+            <h2>Prestations commandées</h2>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Prestations</th>
+                        <th>Prix</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var com in Model.Commandes)
+                    {
+                        <tr>
+                            <td>@com.Prestation.Nom</td>
+                            <td>@com.Montant</td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+            <h3> Datation </h3>
+
+            @if (ViewBag.IsPaid)
+            {
+
+                <p> Facture réglée le @Model.DateReglement</p>
+            }
+            else
+            {
+                <p> Facture à régler</p>
+            }
+        </div>
+        <p class="text-muted text-right"> Facture émise le <span class="badge-primary">@Model.DateEmission</span></p>
+        <div class="col-2"></div>
+
+    </div>
+
+    <button class="btn btn-primary no-print" onclick="window.print()"> Imprimer la facture</button>
+    <button class="btn btn-primary no-print" onclick="sendMail()"> Envoyer par mail à @Model.Client.Mail</button>
+
+
+
+</div>
+
+<script>
+        function sendMail() {
+            var body = document.getElementById("mail").value;
+            window.location.href = "mailto:"+@Model.Client.Mail+" request&body=" + body;
+</script>
+
+<div class="no-print">
+    <a asp-action="Edit" asp-route-id="@Model.Id">Edit</a> |
+    <a asp-action="Index">Retour à la liste</a>
+</div>
