@@ -43,7 +43,7 @@ namespace BillBucket.Models
         public string Description { get; set; }
 
 
-        public virtual ICollection<Commande> Commandes{ get; set; }
+        public virtual ICollection<Prestation> Prestations{ get; set; }
         public virtual Client Client { get; set; }
 
 

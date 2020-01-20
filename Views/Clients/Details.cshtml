@@ -43,6 +43,21 @@
         </dd>
     </dl>
 </div>
+
+<div class="jumbotron">
+    <ul>
+        @foreach (var fac in @Model.Factures)
+        {
+        <li>
+            <span class="font-weight-bold">Facture n°@fac.NoFacture du @fac.DateEmission</span>
+            <a class="btn btn-primary" asp-action="Details" asp-controller="Factures" asp-route-id="@fac.Id">Details</a>
+            <a class="btn btn-primary" asp-action="Edit" asp-controller="Factures" asp-route-id="@fac.Id">Edit</a>
+        </li>
+            
+            
+        }
+    </ul>
+</div>
 <div>
     <a asp-action="Edit" asp-route-id="@Model.Id">Edit</a> |
     <a asp-action="Index">Back to List</a>

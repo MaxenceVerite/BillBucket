@@ -20,6 +20,7 @@ namespace BillBucket.Controllers
 
         public IActionResult Index()
         {
+            
             return View();
         }
 

@@ -51,43 +51,13 @@ namespace BillBucket.Migrations
                     b.HasData(
                         new
                         {
-                            Id = new Guid("1d6f9c4b-ac89-4d30-9a57-459bb0d58c38"),
+                            Id = new Guid("c47638a4-4647-4128-a4bc-cfba3d9e9998"),
                             Adresse = "265 RUE PIERRE JEAN-BAPTISTE 59002 Lille",
                             Mail = "societeproxiad@proxiad.fr",
                             NoSiret = "A127EBHYULIDU1",
                             NoTel = "0322387458",
                             Nom = "Proxiad"
                         });
-                });
-
-            modelBuilder.Entity("BillBucket.Models.Commande", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<Guid?>("FactureId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<Guid>("IdFacture")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<Guid>("IdPrestation")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<double>("Montant")
-                        .HasColumnType("float");
-
-                    b.Property<Guid?>("PrestationId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("FactureId");
-
-                    b.HasIndex("PrestationId");
-
-                    b.ToTable("Commandes");
                 });
 
             modelBuilder.Entity("BillBucket.Models.Facture", b =>
@@ -121,11 +91,11 @@ namespace BillBucket.Migrations
                     b.HasData(
                         new
                         {
-                            Id = new Guid("26313c30-9b39-4b51-889e-44658a0aa309"),
+                            Id = new Guid("25ea78f2-54ad-4291-b302-2be6bc1ee824"),
                             DateEmission = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified).AddTicks(2000),
                             DateReglement = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified).AddTicks(2007),
                             Description = "Achat de deux esclaves chez IB Formation",
-                            IdClient = new Guid("1d6f9c4b-ac89-4d30-9a57-459bb0d58c38"),
+                            IdClient = new Guid("c47638a4-4647-4128-a4bc-cfba3d9e9998"),
                             NoFacture = 1
                         });
                 });
@@ -139,40 +109,39 @@ namespace BillBucket.Migrations
                     b.Property<string>("Description")
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<Guid>("IdFacture")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<double>("Montant")
+                        .HasColumnType("float");
+
                     b.Property<string>("Nom")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.HasKey("Id");
 
+                    b.HasIndex("IdFacture");
+
                     b.ToTable("Prestations");
 
                     b.HasData(
                         new
                         {
-                            Id = new Guid("7541e59d-a5ea-4267-85f3-ec8db35f34cd"),
+                            Id = new Guid("746667bd-097a-4ff1-8a3b-b5d43445453f"),
                             Description = "Nous dressons vos poulets d'entreprises. Ils ressortiront de chez nous en sachant abboyer, danser la polka et remplir vos fonctions de RH",
+                            IdFacture = new Guid("25ea78f2-54ad-4291-b302-2be6bc1ee824"),
+                            Montant = 2700.0,
                             Nom = "Dressage de poulet"
                         },
                         new
                         {
-                            Id = new Guid("ee380eb7-1a71-43c5-b01d-e7a8950e2314"),
+                            Id = new Guid("932cc920-e77e-4da8-989e-6ed0f900dfe2"),
                             Description = "Nous vous fournissons l'élite des tireurs pour éliminer les forces de recrutement concurrentes. Pas cher du tout pour la qualité de la prestation",
+                            IdFacture = new Guid("25ea78f2-54ad-4291-b302-2be6bc1ee824"),
+                            Montant = 50.0,
                             Nom = "Location de chasseurs de prime"
                         });
-                });
-
-            modelBuilder.Entity("BillBucket.Models.Commande", b =>
-                {
-                    b.HasOne("BillBucket.Models.Facture", "Facture")
-                        .WithMany("Commandes")
-                        .HasForeignKey("FactureId")
-                        .OnDelete(DeleteBehavior.Cascade);
-
-                    b.HasOne("BillBucket.Models.Prestation", "Prestation")
-                        .WithMany("Commandes")
-                        .HasForeignKey("PrestationId")
-                        .OnDelete(DeleteBehavior.Cascade);
                 });
 
             modelBuilder.Entity("BillBucket.Models.Facture", b =>
@@ -180,6 +149,15 @@ namespace BillBucket.Migrations
                     b.HasOne("BillBucket.Models.Client", "Client")
                         .WithMany("Factures")
                         .HasForeignKey("IdClient")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("BillBucket.Models.Prestation", b =>
+                {
+                    b.HasOne("BillBucket.Models.Facture", "Facture")
+                        .WithMany("Prestations")
+                        .HasForeignKey("IdFacture")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
                 });

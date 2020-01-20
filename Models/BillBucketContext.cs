@@ -15,7 +15,6 @@ namespace BillBucket.Models
 
        public DbSet<Prestation> Prestations { get; set; }
 
-       public DbSet<Commande> Commandes { get; set; }
 
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
@@ -37,30 +36,25 @@ namespace BillBucket.Models
 
             modelBuilder.Entity<Prestation>().HasKey(pre => pre.Id);
 
-            modelBuilder.Entity<Commande>().HasKey(com => com.Id);
+           
 
 
 
             // Client <-> Facture
             modelBuilder.Entity<Client>().HasMany(cli => cli.Factures)
                                         .WithOne(fac => fac.Client)
+                                        .HasForeignKey(fac=>fac.IdClient)
                                         .OnDelete(DeleteBehavior.Cascade);
 
-            // Facture <-> Client
-            modelBuilder.Entity<Facture>().HasOne(fac => fac.Client)
-                                          .WithMany(cli => cli.Factures)
-                                          .HasForeignKey(fac => fac.IdClient);
-
-
-            // Facture <-> Commande 
-            modelBuilder.Entity<Facture>().HasMany(fac => fac.Commandes)
+            
+            // Facture <-> Prestations 
+            modelBuilder.Entity<Facture>().HasMany(fac => fac.Prestations)
                                           .WithOne(com => com.Facture)
+                                          .HasForeignKey(com=>com.IdFacture)
                                           .OnDelete(DeleteBehavior.Cascade);
 
-            // Prestation <-> Commande
-            modelBuilder.Entity<Prestation>().HasMany(pre => pre.Commandes)
-                                             .WithOne(com => com.Prestation)
-                                             .OnDelete(DeleteBehavior.Cascade);
+          
+            
 
 
             var cl1 = new Client() { 
@@ -82,16 +76,18 @@ namespace BillBucket.Models
 
             var pr1 = new Prestation()
             {
+                IdFacture = fa1.Id,
                 Nom = "Dressage de poulet",
                 Description = "Nous dressons vos poulets d'entreprises. Ils ressortiront de chez nous en sachant abboyer, danser la polka et remplir vos fonctions de RH",
-
+                Montant = 2700
             };
 
             var pr2 = new Prestation()
             {
+                IdFacture = fa1.Id,
                 Nom = "Location de chasseurs de prime",
                 Description = "Nous vous fournissons l'élite des tireurs pour éliminer les forces de recrutement concurrentes. Pas cher du tout pour la qualité de la prestation",
-
+                Montant = 50
             };
 
 

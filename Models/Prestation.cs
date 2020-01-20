@@ -10,10 +10,13 @@ namespace BillBucket.Models
     {
         public Guid Id { get; set; } = Guid.NewGuid();
 
+        public Guid IdFacture { get; set; }
+
         [Required]
         public string Nom { get; set; }
 
+        public double Montant { get; set; }
         public string Description { get; set; }
-        public virtual ICollection<Commande> Commandes { get; set; }
+        public virtual Facture Facture { get; set; }
     }
 }

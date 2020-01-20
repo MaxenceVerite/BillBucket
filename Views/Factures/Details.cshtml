@@ -1,5 +1,7 @@
 ﻿@model BillBucket.Models.Facture
 
+
+
 @{
     ViewData["Title"] = "Details";
     Layout = "~/Views/Shared/_Layout.cshtml";
@@ -63,49 +65,53 @@
     <hr />
 
     @*Le Detail De La Facture*@
-    <div class="jumbotron bg-white row">
-        <div class="col-2"></div>
-        <div class="col-8">
+<div class="jumbotron bg-white row">
+    <div class="col-2"></div>
+    <div class="col-8">
 
 
-            <h3>@Html.DisplayNameFor(m => Model.Description)</h3>
+        <h3>@Html.DisplayNameFor(m => Model.Description)</h3>
 
-            <p>@Model.Description</p>
+        <p>@Model.Description</p>
 
-            <h2>Prestations commandées</h2>
-            <table>
-                <thead>
+        <h2>Details des prestations</h2>
+
+        <table class="table">
+            <thead class="thead-light">
+                <tr>
+                    <th>Prestations</th>
+                    <th>Prix</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var pre in Model.Prestations)
+                {
                     <tr>
-                        <th>Prestations</th>
-                        <th>Prix</th>
+                        <td>@pre.Nom</td>
+                        <td><span class="font-weight-bold">@pre.Montant</span></td>
                     </tr>
-                </thead>
-                <tbody>
-                    @foreach (var com in Model.Commandes)
-                    {
-                        <tr>
-                            <td>@com.Prestation.Nom</td>
-                            <td>@com.Montant</td>
-                        </tr>
-                    }
-                </tbody>
-            </table>
-            <h3> Datation </h3>
+                }
+            </tbody>
+        </table>
 
-            @if (ViewBag.IsPaid)
-            {
+        <h3> Dates </h3>
 
-                <p> Facture réglée le @Model.DateReglement</p>
-            }
-            else
-            {
-                <p> Facture à régler</p>
-            }
-        </div>
-        <p class="text-muted text-right"> Facture émise le <span class="badge-primary">@Model.DateEmission</span></p>
-        <div class="col-2"></div>
+        @if (ViewBag.IsPaid)
+        {
 
+            <p> Facture réglée le @Model.DateReglement</p>
+        }
+        else
+        {
+            <p> Facture à régler</p>
+        }
     </div>
+
+    <p>Montant Total TTC : @ViewBag.MontantTotal</p>
+    <p class="text-muted text-right"> Facture émise le <span class="badge-primary">@Model.DateEmission</span></p>
+    <div class="col-2"></div>
+
+</div>
 
     <button class="btn btn-primary no-print" onclick="window.print()"> Imprimer la facture</button>
     <button class="btn btn-primary no-print" onclick="sendMail()"> Envoyer par mail à @Model.Client.Mail</button>

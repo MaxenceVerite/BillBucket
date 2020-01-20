@@ -35,11 +35,14 @@ namespace BillBucket.Controllers
 
             var facture = await _context.Factures
                 .Include(f => f.Client)
+                .Include(f=> f.Prestations)
                 .FirstOrDefaultAsync(m => m.Id == id);
             if (facture == null)
             {
                 return NotFound();
             }
+
+            ViewBag.IsPaid = facture.DateReglement == null ? false : true;
 
             return View(facture);
         }
@@ -47,7 +50,7 @@ namespace BillBucket.Controllers
         // GET: Factures/Create
         public IActionResult Create()
         {
-            ViewData["IdClient"] = new SelectList(_context.Clients, "Id", "Adresse");
+            ViewData["IdClient"] = new SelectList(_context.Clients, "Id", "Nom");
             return View();
         }
 
@@ -56,7 +59,7 @@ namespace BillBucket.Controllers
         // more details see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("Id,IdClient,NoFacture,Montant,DateEmission,DateReglement,Description")] Facture facture)
+        public async Task<IActionResult> Create([Bind("Id,IdClient,NoFacture,DateEmission,DateReglement,Description")] Facture facture)
         {
             if (ModelState.IsValid)
             {
@@ -65,7 +68,7 @@ namespace BillBucket.Controllers
                 await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
             }
-            ViewData["IdClient"] = new SelectList(_context.Clients, "Id", "Adresse", facture.IdClient);
+            ViewData["IdClient"] = new SelectList(_context.Clients, "Id", "Nom", facture.IdClient);
             return View(facture);
         }
 
@@ -77,12 +80,24 @@ namespace BillBucket.Controllers
                 return NotFound();
             }
 
-            var facture = await _context.Factures.FindAsync(id);
+            var facture = await _context.Factures
+                .Include(f => f.Prestations)
+                .FirstOrDefaultAsync(m => m.Id == id);
+
+
             if (facture == null)
             {
                 return NotFound();
             }
-            ViewData["IdClient"] = new SelectList(_context.Clients, "Id", "Adresse", facture.IdClient);
+            double montantTotal = 0;
+
+            foreach(var pre in facture.Prestations.ToList())
+            {
+                montantTotal += pre.Montant;
+            }
+
+            ViewBag.MontantTotal = montantTotal * 1.20 ;
+            ViewData["IdClient"] = new SelectList(_context.Clients, "Id", "Nom", facture.IdClient);
             return View(facture);
         }
 
@@ -91,7 +106,7 @@ namespace BillBucket.Controllers
         // more details see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(Guid id, [Bind("Id,IdClient,NoFacture,Montant,DateEmission,DateReglement,Description")] Facture facture)
+        public async Task<IActionResult> Edit(Guid id, [Bind("Id,IdClient,NoFacture,DateEmission,DateReglement,Description")] Facture facture)
         {
             if (id != facture.Id)
             {
@@ -116,9 +131,10 @@ namespace BillBucket.Controllers
                         throw;
                     }
                 }
+                
                 return RedirectToAction(nameof(Index));
             }
-            ViewData["IdClient"] = new SelectList(_context.Clients, "Id", "Adresse", facture.IdClient);
+            ViewData["IdClient"] = new SelectList(_context.Clients, "Id", "Nom", facture.IdClient);
             return View(facture);
         }
 
@@ -156,5 +172,31 @@ namespace BillBucket.Controllers
         {
             return _context.Factures.Any(e => e.Id == id);
         }
+
+
+        public async Task<IActionResult> AddPrestation(Guid id, [Bind("Id, IdFacture, Nom, Montant,Description")] Prestation pres)
+        {
+           
+
+            if (ModelState.IsValid)
+            {
+                try
+                {
+                    _context.Prestations.Add(pres);
+                    await _context.SaveChangesAsync();
+                }
+                catch (DbUpdateConcurrencyException)
+                {
+                    return NotFound();
+                }
+
+                return RedirectToAction(nameof(Index));
+            }
+
+            
+            return View();
+        }
     }
+
+
 }

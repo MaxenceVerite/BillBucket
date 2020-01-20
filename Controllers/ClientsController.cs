@@ -33,6 +33,7 @@ namespace BillBucket.Controllers
             }
 
             var client = await _context.Clients
+                .Include(c => c.Factures)
                 .FirstOrDefaultAsync(m => m.Id == id);
             if (client == null)
             {

@@ -18,34 +18,19 @@ namespace BillBucket.Controllers
             _context = context;
         }
 
-        // GET: Prestations
-        public async Task<IActionResult> Index()
-        {
-            return View(await _context.Prestations.ToListAsync());
-        }
 
-        // GET: Prestations/Details/5
-        public async Task<IActionResult> Details(Guid? id)
-        {
-            if (id == null)
-            {
-                return NotFound();
-            }
 
-            var prestation = await _context.Prestations
-                .FirstOrDefaultAsync(m => m.Id == id);
-            if (prestation == null)
-            {
-                return NotFound();
-            }
-
-            return View(prestation);
-        }
 
         // GET: Prestations/Create
-        public IActionResult Create()
+        public IActionResult Create(Guid idFacture)
         {
-            return View();
+            var prestation = new Prestation()
+            {
+                IdFacture = idFacture
+
+            };
+      
+            return View(prestation);
         }
 
         // POST: Prestations/Create
@@ -53,15 +38,16 @@ namespace BillBucket.Controllers
         // more details see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("Id,Nom,Description")] Prestation prestation)
+        public async Task<IActionResult> Create([Bind("Id,IdFacture,Nom,Montant,Description")] Prestation prestation)
         {
             if (ModelState.IsValid)
             {
                 prestation.Id = Guid.NewGuid();
                 _context.Add(prestation);
                 await _context.SaveChangesAsync();
-                return RedirectToAction(nameof(Index));
+                return RedirectToAction("Edit","Factures",new { id=prestation.IdFacture});
             }
+            ViewData["IdFacture"] = new SelectList(_context.Factures, "Id", "Id", prestation.IdFacture);
             return View(prestation);
         }
 
@@ -78,6 +64,7 @@ namespace BillBucket.Controllers
             {
                 return NotFound();
             }
+            ViewData["IdFacture"] = new SelectList(_context.Factures, "Id", "Id", prestation.IdFacture);
             return View(prestation);
         }
 
@@ -86,7 +73,7 @@ namespace BillBucket.Controllers
         // more details see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(Guid id, [Bind("Id,Nom,Description")] Prestation prestation)
+        public async Task<IActionResult> Edit(Guid id, [Bind("Id,IdFacture,Nom,Montant,Description")] Prestation prestation)
         {
             if (id != prestation.Id)
             {
@@ -113,6 +100,7 @@ namespace BillBucket.Controllers
                 }
                 return RedirectToAction(nameof(Index));
             }
+            ViewData["IdFacture"] = new SelectList(_context.Factures, "Id", "Id", prestation.IdFacture);
             return View(prestation);
         }
 
@@ -125,6 +113,7 @@ namespace BillBucket.Controllers
             }
 
             var prestation = await _context.Prestations
+                .Include(p => p.Facture)
                 .FirstOrDefaultAsync(m => m.Id == id);
             if (prestation == null)
             {
@@ -142,7 +131,7 @@ namespace BillBucket.Controllers
             var prestation = await _context.Prestations.FindAsync(id);
             _context.Prestations.Remove(prestation);
             await _context.SaveChangesAsync();
-            return RedirectToAction(nameof(Index));
+            return RedirectToAction("Edit","Factures", new { id=prestation.IdFacture});
         }
 
         private bool PrestationExists(Guid id)
